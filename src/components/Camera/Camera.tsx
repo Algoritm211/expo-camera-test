@@ -1,21 +1,10 @@
-import React, {useRef} from 'react';
+import React from 'react';
 import { StyleSheet, TouchableOpacity, View} from "react-native";
 import {Camera} from "expo-camera";
+import {useCameraContext} from "../../contexts/CameraContext";
 
-interface Props {
-  setIsCameraStarted: (val: boolean) => void;
-}
-
-export const CameraCapture: React.FC<Props> = ({ setIsCameraStarted }) => {
-  const cameraRef = useRef<Camera>(null)
-
-  const takePicture = async () => {
-    setIsCameraStarted(false)
-    if (!cameraRef.current) return
-    const photo = await cameraRef.current.takePictureAsync()
-    console.log(photo)
-  }
-
+export const CameraCapture: React.FC = () => {
+  const { cameraRef, takePicture } = useCameraContext();
   return (
     <>
       <Camera
