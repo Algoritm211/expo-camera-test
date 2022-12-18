@@ -1,6 +1,7 @@
 import React, {RefObject, useContext, useRef, useState} from 'react';
 import {Camera, CameraCapturedPicture} from "expo-camera";
 import {Alert} from "react-native";
+import {saveToLibraryAsync} from "expo-media-library";
 
 interface CameraContextProps {
   cameraRef: RefObject<Camera>
@@ -17,14 +18,14 @@ interface CameraContextProps {
 const CameraContext = React.createContext<CameraContextProps>({} as CameraContextProps)
 CameraContext.displayName = 'CameraContext'
 
-export const CameraContextProvider: React.FC<{ children: JSX.Element }> = ({ children }) => {
+export const CameraContextProvider: React.FC<{ children: JSX.Element }> = ({children}) => {
   const [isCameraWorking, setIsCameraWorking] = useState(false);
   const [previewVisible, setPreviewVisible] = useState(false)
   const [capturedImage, setCapturedImage] = useState<CameraCapturedPicture | null>(null)
   const cameraRef = useRef<Camera>(null)
 
   const onStartCamera = async () => {
-    const { status } = await Camera.requestCameraPermissionsAsync()
+    const {status} = await Camera.requestCameraPermissionsAsync()
     if (status === 'granted') {
       setIsCameraWorking(true)
     } else {
@@ -46,9 +47,15 @@ export const CameraContextProvider: React.FC<{ children: JSX.Element }> = ({ chi
     void onStartCamera()
   }
 
-  const savePhoto = () => {
+  const savePhoto = async () => {
     setIsCameraWorking(false)
-    console.log('Photo was saved')
+    if (capturedImage) {
+      console.log('Photo is saving')
+      await saveToLibraryAsync(capturedImage.uri)
+      console.log('Photo was saved')
+      return
+    }
+    console.log('Photo was not saved')
   }
 
   const contextValue = {
